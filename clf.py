@@ -1,4 +1,5 @@
 from sklearn.feature_extraction.text import CountVectorizer as CV
+from sklearn.feature_extraction.text import TfidfVectorizer as TV
 from sklearn.cross_validation import LeaveOneOut as LOO
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier as DT
@@ -28,7 +29,8 @@ for l in lines:
 '''
 
 label = np.array(label)
-vc = CV(token_pattern='[a-z]{2,}')
+#vc = CV(token_pattern='[a-z]{2,}', binary=True)
+vc = TV(token_pattern='[a-z]{2,}',binary=True)
 vector = vc.fit_transform(field).toarray()
 idx = LOO(len(vector))
 preds = []
@@ -68,8 +70,7 @@ for x in xrange(len(cm)):
                      verticalalignment='center')
 
 
-mapping = {'Recreation': 1, 'Transportation': 2, 'Business': 3, 'Public-Safety': 4, 'Social-Services': 5, 'Environment': 6, 'Health': 7, 'City-Government': 8, 'Education': 9, 'Housing-Development': 10}
-cls = ['recrtn','trnsptn','busi','safety','services','environ','health','gov','edu','housing']
+cls = ['recrtn','trans','busi','safety','servcs','environ','health','gov','edu','housing']
 pl.xticks(range(len(cm)),cls)
 pl.yticks(range(len(cm)),cls)
 pl.title('Confusion matrix')
