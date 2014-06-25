@@ -49,9 +49,9 @@ preds = []
 a_sum = []
 ctr = 0
 #clf = DT(criterion='entropy', random_state=0)
-#clf = RFC(n_estimators=50, criterion='entropy')
+clf = RFC(n_estimators=50, criterion='entropy')
 #clf = GNB()
-#clf = SVC(kernel='linear')
+#clf = SVC(C=0.1,kernel='linear')
 for train, test in idx:
     train_data = vector[train]
     train_label = label[train]
