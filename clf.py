@@ -17,28 +17,29 @@ import pylab as pl
 
 mapping = {'Recreation': 1, 'Transportation': 2, 'Business': 3, 'Public-Safety': 4, 'Social-Services': 5, 'Environment': 6, 'Health': 7, 'City-Government': 8, 'Education': 9, 'Housing-Development': 10}
 lines = [i.strip().split(',') for i in open('ny_dump','r').readlines()]
-field = []
+data = []
 label = []
 sum_all = {}
 sum_use = {}
 for l in lines:
     sum_all[l[3]] = sum_all.get(l[3],0) + 1
     if len(l)>6:
-        field.append(' '.join(l[5:]))
+        data.append(' '.join(l[5:]))
         label.append(mapping[l[3]])
         sum_use[l[3]] = sum_use.get(l[3],0) + 1
 print sum_all
 print sum_use
 
 '''
--break down all the fields into single words (?)
+-break down all the datas into single words (?)
 -vectorize the bag of words for each dataset
 -train and testing
 '''
 label = np.array(label)
-vc = CV(token_pattern='[a-z]{2,}')
+vc = CV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
+#vc = TV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
 #vc = TV(token_pattern='[a-z]{2,}', binary=True)
-vector = vc.fit_transform(field).toarray()
+vector = vc.fit_transform(data).toarray()
 #print len(vc.get_feature_names())
 #print vc.get_feature_names()
 fold = 10
@@ -52,6 +53,9 @@ ctr = 0
 clf = RFC(n_estimators=50, criterion='entropy')
 #clf = GNB()
 #clf = SVC(C=0.1,kernel='linear')
+tmp = 0
+l = []
+p = [] #array to track the predictions with highest acc
 for train, test in idx:
     train_data = vector[train]
     train_label = label[train]
@@ -66,11 +70,14 @@ for train, test in idx:
     acc = accuracy_score(test_label, preds)
     a_sum.append(acc)
     print acc
-
+    if acc>tmp:
+        tmp = acc
+        l = test_label[:]
+        p = preds[:]
 print 'ave acc:', np.mean(a_sum)
 print 'std:', np.std(a_sum)
 
-cm = CM(test_label,preds)
+cm = CM(l,p)
 #print cm
 cm = normalize(cm.astype(np.float), axis=1, norm='l1')
 #print cm

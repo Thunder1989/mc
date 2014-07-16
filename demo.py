@@ -28,7 +28,9 @@ for l in lines:
         #sum_use[l[3]] = sum_use.get(l[3],0) + 1
 #print sum_all
 #print sum_use
+
 print 'we have schema in the DB:'
+print '(Class Number : Field Names)'
 for l,f in zip(label,field):
     print l,':',' | '.join(f.split())
 print '==================================='
@@ -36,11 +38,6 @@ print '==================================='
 ddl = raw_input('give me your field names sepearted by white place: ')
 print '==================================='
 
-'''
--break down all the fields into single words (?)
--vectorize the bag of words for each dataset
--train and testing
-'''
 label = np.array(label)
 vc = CV(token_pattern='[a-z]{2,}', binary=True)
 #vc = TV(token_pattern='[a-z]{2,}', binary=True)
@@ -82,8 +79,8 @@ for t in tmp:
 for t in target:
     if t not in tmp:
         add.append(t)
-print 'need to remove:', '|'.join(rmv)
-print 'need to add:', '|'.join(add)
+print 'need to remove:', ' | '.join(rmv)
+print 'need to add:', ' | '.join(add)
 
 
 
