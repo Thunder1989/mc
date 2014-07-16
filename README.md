@@ -1,6 +1,6 @@
-MicroCloud
+MCloud
 ==========
-Code for the MicroCloud project
+Code for the MCloud project
 
 1. Get data through Opeb Data API
 2. Analyze the data (thru schema matching, etc)
