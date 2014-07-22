@@ -22,9 +22,17 @@ label = []
 sum_all = {}
 sum_use = {}
 for l in lines:
+    '''
+    1-agency
+    2-name
+    3-description
+    4-category
+    5-url id
+    6:-field names
+    '''
     sum_all[l[3]] = sum_all.get(l[3],0) + 1
     if len(l)>6:
-        data.append(' '.join(l[5:]))
+        data.append(l[2]+' '+' '.join(l[5:]))
         label.append(mapping[l[3]])
         sum_use[l[3]] = sum_use.get(l[3],0) + 1
 print sum_all
@@ -38,6 +46,7 @@ print sum_use
 label = np.array(label)
 vc = CV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
 #vc = TV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
+#vc = CV(token_pattern='[a-z]{2,}', binary=True)
 #vc = TV(token_pattern='[a-z]{2,}', binary=True)
 vector = vc.fit_transform(data).toarray()
 #print len(vc.get_feature_names())
