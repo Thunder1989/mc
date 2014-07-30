@@ -2,11 +2,12 @@ import json
 import urllib2
 import re
 
-start = 1113 #id=570 is missed
+start = 560#id=570 is missed
+#552 currently is missing
 limit = 500
 i = 0
 counter = 0
-f = open('ny_dump','a')
+f = open('ny_dump_new','a')
 #f = open('ny_list','w')
 
 while True:
@@ -27,6 +28,7 @@ while True:
     1456 are informative
     '''
     for d in res:
+        print json.dumps(d, indent=4, sort_keys=True)
         info = []
         l = d['link']['url'].split('/')
         catalog = l[3]
@@ -40,12 +42,13 @@ while True:
         info.append(catalog)
         info.append(identifier)
         info = [l.encode(encoding='UTF-8') for l in info]
+        #print info
         for l in info:
             #l = l.replace('\n','')
             l = re.sub('(\n|,)',' ',l)
             f.write(l + ',')
-        link = "http://data.cityofnewyork.us/resource/%s.json?$limit=1&$offset=0"%identifier
-        print link
+        link = "http://data.cityofnewyork.us/resource/%s.json?$limit=2&$offset=0"%identifier
+        print 'dumping...', identifier
         try:
             counter+=1
             item = json.load(urllib2.urlopen(link))
@@ -53,6 +56,7 @@ while True:
             print 'id %s got Err %d'%(identifier, e.code)
         else:
             print 'id', counter, 'done...'
+            print json.dumps(item, indent=4, sort_keys=True)
             if item:
                 item = item[0].keys()
                 item = [l.encode(encoding='UTF-8') for l in item]
