@@ -2,33 +2,6 @@ import json
 import urllib2
 import re
 
-
-def _decode_list(data):
-    rv = []
-    for item in data:
-        if isinstance(item, unicode):
-            item = item.encode('utf-8')
-        elif isinstance(item, list):
-            item = _decode_list(item)
-        elif isinstance(item, dict):
-            item = _decode_dict(item)
-        rv.append(item)
-    return rv
-
-def _decode_dict(data):
-    rv = {}
-    for key, value in data.iteritems():
-        if isinstance(key, unicode):
-            key = key.encode('utf-8')
-        if isinstance(value, unicode):
-            value = value.encode('utf-8')
-        elif isinstance(value, list):
-            value = _decode_list(value)
-        elif isinstance(value, dict):
-            value = _decode_dict(value)
-        rv[key] = value
-    return rv
-
 start = 0#id=570 is missed
 #552 currently is missing
 limit = 500
@@ -39,7 +12,7 @@ f = open('ny_dump_new','a')
 
 while True:
     link = "http://data.cityofnewyork.us/resource/j9m9-eu6n.json?$limit=%d&$offset=%d"%(limit,start)
-    res = json.load(urllib2.urlopen(link), object_hook=_decode_dict)
+    res = json.load(urllib2.urlopen(link))
     start += limit
     i += len(res)
     #print json.dumps(res, indent=4, sort_keys=True)
@@ -68,7 +41,7 @@ while True:
             info.append('')
         info.append(catalog)
         info.append(identifier)
-        #info = [l.encode(encoding='UTF-8') for l in info]
+        info = [l.encode(encoding='UTF-8') for l in info]
         #print info
         for l in info:
             #l = l.replace('\n','')
@@ -78,7 +51,7 @@ while True:
         print 'dumping...', identifier
         try:
             counter+=1
-            item = json.load(urllib2.urlopen(link), object_hook=_decode_dict)
+            item = json.load(urllib2.urlopen(link))
         except Exception as e:
             print 'id %s got Err %d'%(identifier, e.code)
         else:
@@ -86,14 +59,17 @@ while True:
             #print json.dumps(item, indent=4, sort_keys=True)
             if item:
                 d = item[0]
-                for k,v in item[1].items():
-                    d[k] = str(d.get(k))+'<<'+str(v)
                 print d
-                f.write(",".join(['%s<%s'%(k,v) for k,v in d.items()]))
-                #item = item[0].keys()
-                #item = [l.encode(encoding='UTF-8') for l in item]
-                #item = sorted(item)
-                #f.write(",".join(item))
+                for k,v in item[1].items():
+                    d[k] = d.get(k)+'<'+v
+                print d
+                for k,v in d.items():
+                    s = '%s<%s'%(k,v)
+
+                        #item = item[0].keys()
+                        #item = [l.encode(encoding='UTF-8') for l in item]
+                        #item = sorted(item)
+                        #f.write(",".join(item))
         f.write('\n')
         #print l[3], l[-1]
         #print json.dumps(d, indent=4, sort_keys=True)
