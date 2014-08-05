@@ -29,11 +29,11 @@ def _decode_dict(data):
         rv[key] = value
     return rv
 
-start = 0#id=570 is missed
-#552 currently is missing
+start = 558#id=570 is missed
+#558\569\ in new dumping missing
 limit = 500
 i = 0
-counter = 0
+counter = start
 f = open('ny_dump_new','a')
 #f = open('ny_list','w')
 
@@ -86,10 +86,11 @@ while True:
             #print json.dumps(item, indent=4, sort_keys=True)
             if item:
                 d = item[0]
-                for k,v in item[1].items():
-                    d[k] = str(d.get(k))+'<<'+str(v)
-                print d
-                f.write(",".join(['%s<%s'%(k,v) for k,v in d.items()]))
+                if len(item)>1:
+                    for k,v in item[1].items():
+                        d[k] = str(d.get(k)).replace('\n', ' ')+'<<'+str(v).replace('\n', ' ')
+                    #print d
+                f.write(",".join(['%s<<%s'%(k,v) for k,v in d.items()]))
                 #item = item[0].keys()
                 #item = [l.encode(encoding='UTF-8') for l in item]
                 #item = sorted(item)
