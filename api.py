@@ -19,8 +19,11 @@ mapping = {'Recreation': 1, 'Transportation': 2, 'Business': 3, 'Public-Safety':
 lines = [i.strip().split(',') for i in open('ny_dump','r').readlines()]
 data = []
 label = []
-sum_all = {}
+#sum_all = {}
 sum_use = {}
+a = 0
+b = 0
+print len(lines)
 for l in lines:
     '''
     1-agency
@@ -30,17 +33,26 @@ for l in lines:
     5-url id
     6:-field names
     '''
-    sum_all[l[3]] = sum_all.get(l[3],0) + 1
+    #sum_all[l[3]] = sum_all.get(l[3],0) + 1
     if len(l)>6:
-        #data.append(l[2]+' '+' '.join(l[5:]))
-        data.append(l[2])
+        a+=1
+        data.append(l[2]+' '+' '.join(l[5:]))
+        #data.append(l[2])
         label.append(mapping[l[3]])
         sum_use[l[3]] = sum_use.get(l[3],0) + 1
-print sum_all
+    else:
+        b+=1
+        lines.remove(l)
+print a
+print b
+#print sum_all
 print sum_use
+print len(lines)
+print len(data)
+print len(label)
 
 '''
--break down all the datas into single words (?)
+-break down all the datas into single word (?)
 -vectorize the bag of words for each dataset
 -train and testing
 '''
@@ -49,34 +61,65 @@ vc = CV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,
 #vc = TV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
 #vc = CV(token_pattern='[a-z]{2,}', binary=True)
 #vc = TV(token_pattern='[a-z]{2,}', binary=True)
+
 vector = vc.fit_transform(data).toarray()
 #print len(vc.get_feature_names())
 #print vc.get_feature_names()
-fold = 10
-#idx = LOO(len(vector))
-idx = StratifiedKFold(label, n_folds=fold)
 
-preds = []
-a_sum = []
-ctr = 0
+idx = LOO(len(vector))
+#fold = 10
+#idx = StratifiedKFold(label, n_folds=fold)
+
 #clf = DT(criterion='entropy', random_state=0)
 clf = RFC(n_estimators=50, criterion='entropy')
 #clf = GNB()
 #clf = SVC(C=0.1,kernel='linear')
+preds = []
+a_sum = []
+ctr = 0
 tmp = 0
 l = []
-p = [] #array to track the predictions with highest acc
+p = [] #array to store the prediction with highest acc
+ctr = 0
 for train, test in idx:
+    if ctr>0:
+        break
+
     train_data = vector[train]
     train_label = label[train]
     test_data = vector[test]
     test_label = label[test]
     clf.fit(train_data, train_label)
-    preds = clf.predict(test_data)
+    pred = clf.predict(test_data)
     #preds.append(pred)
     #if pred != test_label:
     #    ctr += 1
     #    print 'inst', i+1, '%d:%d'%(test_label,pred)
+
+    i=0
+    while i<len(lines):
+        if np.asarray(i)==test:
+            i+=1
+            continue
+        if label[i]!=pred:
+            lines.append(',1')
+        else:
+            clf_ = RFC(n_estimators=50, criterion='entropy')
+            idx_ = range(len(vector))
+            idx_.remove(test)
+            idx_.remove(i)
+            train_data_ = vector[idx_]
+            train_label_ = label[idx_]
+            clf_.fit(train_data_, train_label_)
+            pr_ex = clf_.predict_proba(vector[test])
+            pr_cur = clf_.predict_proba(vector[i])
+            d = np.linalg.norm((pr_ex-pr_cur), ord=2)
+            print d
+        i+=1
+
+    ctr+=1
+
+'''
     acc = accuracy_score(test_label, preds)
     a_sum.append(acc)
     print acc
@@ -112,3 +155,4 @@ pl.title('Confusion matrix')
 pl.ylabel('True label')
 pl.xlabel('Predicted label')
 pl.show()
+'''
