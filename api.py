@@ -50,9 +50,9 @@ for l in lines:
 -train and testing
 '''
 label = np.array(label)
-vc = CV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
+#vc = CV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
 #vc = TV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
-#vc = CV(token_pattern='[a-z]{2,}', binary=True)
+vc = CV(token_pattern='[a-z]{2,}', binary=True)
 #vc = TV(token_pattern='[a-z]{2,}', binary=True)
 
 vector = vc.fit_transform(data).toarray()
@@ -69,9 +69,6 @@ clf = RFC(n_estimators=50, criterion='entropy')
 #clf = SVC(C=0.1,kernel='linear')
 ctr = 0
 for train, test in idx:
-    if ctr>0:
-        break
-
     train_data = vector[train]
     train_label = label[train]
     test_data = vector[test]
@@ -79,17 +76,20 @@ for train, test in idx:
     clf.fit(train_data, train_label)
     pred = clf.predict(test_data)
     #preds.append(pred)
-    #if pred != test_label:
+    if pred != test_label:
+        continue
     #    ctr += 1
     #    print 'inst', i+1, '%d:%d'%(test_label,pred)
 
     i=0
     while i<len(lines):
-        if np.asarray(i)==test:
+        if i==test:
+            lines[i].append(100)
             i+=1
             continue
         if label[i]!=pred:
-            lines[i].append('1')
+            lines[i].append(100)
+        #using distance btw two prob vector
         else:
             clf_ = RFC(n_estimators=50, criterion='entropy')
             idx_ = range(len(vector))
@@ -102,15 +102,21 @@ for train, test in idx:
             pr_cur = clf_.predict_proba(vector[i])
             d = np.linalg.norm((pr_ex-pr_cur), ord=2)
             lines[i].append(d)
+            '''
+        else:
+            d = np.linalg.norm((vector[i]-vector[test]), ord=2)/np.linalg.norm((vector[i]), ord=2)
+            lines[i].append(d)
+            '''
         i+=1
-
-    ctr+=1
+    break
 
 #res = [i.rsplit(',',1) for i in lines]
 source = lines[test]
 print source
-res = sorted(lines, key=lambda x:x[-1])[:5]
-print '\n'.join(res[:5])
+lines = sorted(lines, key=lambda x:x[-1])
+res = lines[:5]
+for i in res:
+    print i
 
 '''
     acc = accuracy_score(test_label, preds)
