@@ -16,14 +16,18 @@ import numpy as np
 import pylab as pl
 
 mapping = {'Recreation': 1, 'Transportation': 2, 'Business': 3, 'Public-Safety': 4, 'Social-Services': 5, 'Environment': 6, 'Health': 7, 'City-Government': 8, 'Education': 9, 'Housing-Development': 10}
-lines = [i.strip().split(',') for i in open('ny_dump','r').readlines()]
+raw_lines = [i.strip().split(',') for i in open('ny_dump','r').readlines()]
+lines = []
 data = []
 label = []
 #sum_all = {}
 sum_use = {}
-a = 0
-b = 0
-print len(lines)
+for l in raw_lines:
+    if len(l)>6:
+        lines.append(l)
+    else:
+        pass
+
 for l in lines:
     '''
     1-agency
@@ -34,22 +38,11 @@ for l in lines:
     6:-field names
     '''
     #sum_all[l[3]] = sum_all.get(l[3],0) + 1
-    if len(l)>6:
-        a+=1
-        data.append(l[2]+' '+' '.join(l[5:]))
-        #data.append(l[2])
-        label.append(mapping[l[3]])
-        sum_use[l[3]] = sum_use.get(l[3],0) + 1
-    else:
-        b+=1
-        lines.remove(l)
-print a
-print b
-#print sum_all
-print sum_use
-print len(lines)
-print len(data)
-print len(label)
+    data.append(l[2]+' '+' '.join(l[5:]))
+    #data.append(l[2])
+    label.append(mapping[l[3]])
+    sum_use[l[3]] = sum_use.get(l[3],0) + 1
+#print sum_use
 
 '''
 -break down all the datas into single word (?)
@@ -74,12 +67,6 @@ idx = LOO(len(vector))
 clf = RFC(n_estimators=50, criterion='entropy')
 #clf = GNB()
 #clf = SVC(C=0.1,kernel='linear')
-preds = []
-a_sum = []
-ctr = 0
-tmp = 0
-l = []
-p = [] #array to store the prediction with highest acc
 ctr = 0
 for train, test in idx:
     if ctr>0:
@@ -102,7 +89,7 @@ for train, test in idx:
             i+=1
             continue
         if label[i]!=pred:
-            lines.append(',1')
+            lines[i].append('1')
         else:
             clf_ = RFC(n_estimators=50, criterion='entropy')
             idx_ = range(len(vector))
@@ -114,10 +101,16 @@ for train, test in idx:
             pr_ex = clf_.predict_proba(vector[test])
             pr_cur = clf_.predict_proba(vector[i])
             d = np.linalg.norm((pr_ex-pr_cur), ord=2)
-            print d
+            lines[i].append(d)
         i+=1
 
     ctr+=1
+
+#res = [i.rsplit(',',1) for i in lines]
+source = lines[test]
+print source
+res = sorted(lines, key=lambda x:x[-1])[:5]
+print '\n'.join(res[:5])
 
 '''
     acc = accuracy_score(test_label, preds)
