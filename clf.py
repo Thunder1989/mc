@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.ensemble import ExtraTreesClassifier as ETC
 from sklearn.ensemble import AdaBoostClassifier as Ada
 from sklearn.naive_bayes import GaussianNB as GNB
+from sklearn.naive_bayes import MultinomialNB as MNB
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix as CM
@@ -32,8 +33,9 @@ for l in lines:
     '''
     #sum_all[l[3]] = sum_all.get(l[3],0) + 1
     if len(l)>6:
-        data.append(l[2]+' '+' '.join(l[5:]))
-        #data.append(l[2])
+        #data.append(l[2]+' '+' '.join(l[5:]))
+        #data.append(' '.join(l[5:]))
+        data.append(l[2])
         label.append(mapping[l[3]])
         sum_use[l[3]] = sum_use.get(l[3],0) + 1
 #print sum_all
@@ -44,7 +46,7 @@ print sum_use
 -train and testing
 '''
 label = np.array(label)
-#vc = CV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
+#vc = CV(analyzer='char_wb', ngram_range=(2,5), min_df=1, token_pattern='[a-z]{2,}')
 #vc = TV(analyzer='char_wb', ngram_range=(2,3), min_df=1, token_pattern='[a-z]{2,}')
 vc = CV(token_pattern='[a-z]{2,}')
 #vc = TV(token_pattern='[a-z]{2,}', binary=True)
@@ -58,9 +60,16 @@ idx = StratifiedKFold(label, n_folds=fold)
 preds = []
 a_sum = []
 ctr = 0
+'''
+in general, from experiments we see:
+    -using description>mixed>column names
+    -GNB>MNB~=SBVM>RF
+    -whole word>n-gram-ed vector
+'''
 #clf = DT(criterion='entropy', random_state=0)
-clf = RFC(n_estimators=50, criterion='entropy')
-#clf = GNB()
+#clf = RFC(n_estimators=50, criterion='entropy')
+clf = GNB()
+#clf = MNB()
 #clf = SVC(C=0.1,kernel='linear')
 tmp = 0
 l = []
