@@ -98,6 +98,7 @@ while True:
             continue
         if label[i]!=pred:
             lines[i].append(100)
+            '''
         #using distance btw two prob vector
         else:
             clf_ = RFC(n_estimators=50, criterion='entropy')
@@ -114,9 +115,8 @@ while True:
             lines[i].append(d)
             '''
         else:
-            d = np.linalg.norm((vector[i]-vector[test]), ord=2)/np.linalg.norm((vector[i]), ord=2)
+            d = np.linalg.norm((vector_[i]-vector_[test]), ord=2)/np.linalg.norm((vector_[i]), ord=2)
             lines[i].append(d)
-            '''
         i+=1
     break
 
@@ -128,11 +128,13 @@ lines = sorted(lines, key=lambda x:x[-1])
 res = lines[:5]
 print 'target<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
 for i in res:
+    print 'distance:', i[-1]
     print 'Publishing Agency:', i[0]
     print 'Name:', i[1]
+    print 'Category:', i[3]
     print 'Despriction:', i[2]
     print 'Columns:'
-    print '|'.join(i[5:-1])
+    print ' | '.join(i[5:-1])
     print '------------------------------------------------'
 
 '''
