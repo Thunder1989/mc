@@ -115,7 +115,9 @@ while True:
             lines[i].append(d)
             '''
         else:
-            d = np.linalg.norm((vector_[i]-vector_[test]), ord=2)/np.linalg.norm((vector_[i]), ord=2)
+            L_i = np.linalg.norm((vector_[i]), ord=2)
+            L_test = np.linalg.norm((vector_[test]), ord=2)
+            d = np.linalg.norm((vector_[i]/L_i - vector_[test]/L_test), ord=2)
             lines[i].append(d)
         i+=1
     break
@@ -123,7 +125,12 @@ while True:
 #res = [i.rsplit(',',1) for i in lines]
 source = lines[test]
 print 'source>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
-print source
+print 'Publishing Agency:', source[0]
+print 'Name:', source[1]
+print 'Despriction:', source[2]
+print 'Category:', source[3]
+print 'Columns:'
+print ' | '.join(source[5:-1])
 lines = sorted(lines, key=lambda x:x[-1])
 res = lines[:5]
 print 'target<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
@@ -131,8 +138,8 @@ for i in res:
     print 'distance:', i[-1]
     print 'Publishing Agency:', i[0]
     print 'Name:', i[1]
-    print 'Category:', i[3]
     print 'Despriction:', i[2]
+    print 'Category:', i[3]
     print 'Columns:'
     print ' | '.join(i[5:-1])
     print '------------------------------------------------'

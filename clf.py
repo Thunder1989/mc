@@ -81,7 +81,7 @@ for train, test in idx:
     test_label = label[test]
     clf.fit(train_data, train_label)
     preds = clf.predict(test_data)
-    #preds.append(pred)
+    #preds.append(clf.predict(test_data))
     #if pred != test_label:
     #    ctr += 1
     #    print 'inst', i+1, '%d:%d'%(test_label,pred)
@@ -92,13 +92,14 @@ for train, test in idx:
         tmp = acc
         l = test_label[:]
         p = preds[:]
+#acc = accuracy_score(label, preds)
+#print acc
 print 'ave acc:', np.mean(a_sum)
 print 'std:', np.std(a_sum)
 
-cm = CM(l,p)
-#print cm
+#cm = CM(label, preds)
+cm = CM(l, p)
 cm = normalize(cm.astype(np.float), axis=1, norm='l1')
-#print cm
 #cm /= cm.astype(np.float).sum(axis=1)
 fig = pl.figure()
 ax = fig.add_subplot(111)
@@ -112,7 +113,7 @@ for x in xrange(len(cm)):
                      verticalalignment='center')
 
 
-cls = ['recrtn','trans','busi','safety','servcs','environ','health','gov','edu','housing']
+cls = ['rec','trnsp','busi','safety','svcs','environ','health','gov','edu','housing']
 pl.xticks(range(len(cm)),cls)
 pl.yticks(range(len(cm)),cls)
 pl.title('Confusion matrix')
