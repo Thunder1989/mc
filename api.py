@@ -124,16 +124,16 @@ while True:
 
 #res = [i.rsplit(',',1) for i in lines]
 source = lines[test]
-print 'source>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+print '>>>>>>>>>>SOURCE>>>>>>>>>>>>>>>>>>>>>>>>>>'
 print 'Publishing Agency:', source[0]
 print 'Name:', source[1]
-print 'Despriction:', source[2]
+print 'Description:', source[2]
 print 'Category:', source[3]
 print 'Columns:'
 print ' | '.join(source[5:-1])
 lines = sorted(lines, key=lambda x:x[-1])
 res = lines[:5]
-print 'target<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
+print '<<<<<<<<<<TARGET<<<<<<<<<<<<<<<<<<<<<<<<<<'
 for i in res:
     print 'distance:', i[-1]
     print 'Publishing Agency:', i[0]
